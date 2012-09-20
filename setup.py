@@ -28,5 +28,5 @@ setup(
         "celery",
         "django-celery",
     ],
-    data_files=[('templates', ['base.html', 'base.txt'])],
+    package_data={'mailing': ['templates/mailing/base.html', 'templates/mailing/base.txt']},
 )

@@ -33,14 +33,6 @@ settings.DEFAULT_FROM_EMAIL
 You need to set your default from email::
     DEFAULT_FROM_EMAIL = 'contact@mydomain.com'
 
-settings.MAILING_REPLACE_DJANGO_CORE_EMAIL
-------------------------------------------
-
-Boolean to indicate you want to replace django's core send_mail function::
-
-    MAILING_REPLACE_DJANGO_CORE_EMAIL = True
-
-Therefore, emails sent using send_mail will add headers/footers support and will send these email in background if using celery.
 
 settings.MAILING_USE_SENDGRID
 -----------------------------
@@ -127,9 +119,22 @@ settings.MAILING_LANGUAGES
 
 Not yet implemented.
 
+Replacing the core django send_mail function
+--------------------------------------------
 
-USAGE
-=====
+To replace Django's core send_mail function to add support for email templates, SendGrid integration and background celery sending, add the following code to your settings file::
+    import sys
+    from mailing.mail import send_email_default
+    try:
+        from django.core import mail 
+        mail.send_mail = send_email_default
+        sys.modules['django.core.mail'] = mail
+    except ImportError:
+        pass
+
+
+Using django-mailing
+====================
 
 Simple multi-part send_mail replacement
 ---------------------------------------

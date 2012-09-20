@@ -13,14 +13,14 @@ django-mailing was developed to:
 Installation
 ============
 
-Available on PyPi::
+Available on PyPi:
 
     pip install django-mailing
 
 Configuration
 =============
 
-Add to your installed apps in your setting.py file::
+Add to your installed apps in your setting.py file:
 
     INSTALLED_APPS = (
     ...
@@ -30,22 +30,14 @@ Add to your installed apps in your setting.py file::
 settings.DEFAULT_FROM_EMAIL
 ---------------------------
 
-You need to set your default from email::
+You need to set your default from email:
     DEFAULT_FROM_EMAIL = 'contact@mydomain.com'
 
-settings.MAILING_REPLACE_DJANGO_CORE_EMAIL
-------------------------------------------
-
-Boolean to indicate you want to replace django's core send_mail function::
-
-    MAILING_REPLACE_DJANGO_CORE_EMAIL = True
-
-Therefore, emails sent using send_mail will add headers/footers support and will send these email in background if using celery.
 
 settings.MAILING_USE_SENDGRID
 -----------------------------
 
-Boolean to indicate you have configured Django to use SendGrid::
+Boolean to indicate you have configured Django to use SendGrid:
 
     MAILING_USE_SENDGRID = True
 
@@ -57,11 +49,11 @@ The impact is you now have additional SendGrid capabilities such as the ability 
 settings.MAILING_MAILTO_HIJACK
 ------------------------------
 
-You can hijack email sent by your app to redirect to another email. Quite practical when developing or testing with external email addresses::
+You can hijack email sent by your app to redirect to another email. Quite practical when developing or testing with external email addresses:
 
     MAILING_MAILTO_HIJACK = 'me@mydomain.com'
 
-If defined, every outgoind email will be sent to me@mydomain.com. For debugging/testing purposes, the following header is added to the email::
+If defined, every outgoind email will be sent to me@mydomain.com. For debugging/testing purposes, the following header is added to the email:
 
     X-MAILER-ORIGINAL-MAILTO: me@mydomain.com
 
@@ -70,13 +62,13 @@ It will contain what would have been the original "To" header if we hadn't hijac
 settings.MAILING_USE_CELERY
 ---------------------------
 
-Boolean indicating celery is configured and you want to send/process email related stuff in background::
+Boolean indicating celery is configured and you want to send/process email related stuff in background:
 
     MAILING_USE_CELERY = True
 
 For example, you can configure your app to use celery by installing a redis server.
 
-Your settings would also need to include things like::
+Your settings would also need to include things like:
 
     INSTALLED_APPS = (
         #
@@ -117,7 +109,7 @@ Your settings would also need to include things like::
     CELERY_REDIS_PORT = 6379
     CELERY_REDIS_DB = 0
 
-When running the celery daemon, you need to include the ``mailing`` app in the tasks through the ``include`` parameter. Example::
+When running the celery daemon, you need to include the ``mailing`` app in the tasks through the ``include`` parameter. Example:
     manage.py celeryd --verbosity=2 --beat --schedule=celery --events --loglevel=INFO -I mailing
 
 You therefore could run a separate celery daemon to run your mailing tasks independently of other tasks if the need arises.
@@ -127,14 +119,27 @@ settings.MAILING_LANGUAGES
 
 Not yet implemented.
 
+Replacing the core django send_mail function
+--------------------------------------------
 
-USAGE
-=====
+To replace Django's core send_mail function to add support for email templates, SendGrid integration and background celery sending, add the following code to your settings file:
+    import sys
+    from mailing.mail import send_email_default
+    try:
+        from django.core import mail 
+        mail.send_mail = send_email_default
+        sys.modules['django.core.mail'] = mail
+    except ImportError:
+        pass
+
+
+Using django-mailing
+====================
 
 Simple multi-part send_mail replacement
 ---------------------------------------
 
-You can using mailing.send_email instead of Django's send_mail to send multi-part messages::
+You can using mailing.send_email instead of Django's send_mail to send multi-part messages:
     send_email(recipients, subject, text_content=None, html_content=None, from_email=settings.DEFAULT_FROM_EMAIL, category=None, fail_silently=False, bypass_queue=False)
 
 Parameters are:
@@ -147,7 +152,7 @@ Parameters are:
 
 You must supply at least text_content or html_content. If both aren't supplied, an exception will be raised. If only one of the two is supplied, the email will be sent in the corresponding format. If both content are supplied, a multi-part email will be sent.
 
-Example usage::
+Example usage:
 
     from mailing import send_email
 
@@ -156,7 +161,7 @@ Example usage::
 Rendering and sending emails using templates
 --------------------------------------------
 
-To use Django templates to generate dynamic emails, similar to using ``render_with_context`` in a Django view, use the ``render_send_email`` shortcut::
+To use Django templates to generate dynamic emails, similar to using ``render_with_context`` in a Django view, use the ``render_send_email`` shortcut:
     render_send_email(recipients, template, data, from_email=settings.DEFAULT_FROM_EMAIL, subject=None, category=None, fail_silently=False, language='en', bypass_queue=False)
 
 Parameters are:
@@ -167,7 +172,7 @@ Parameters are:
  * ``subject`` is the subject of your email
  * ``category`` is a string and is used to define SendGrid's X-SMTPAPI's category header
 
-Example::
+Example:
     def send_welcome_email(user):
         from mailing.shortcuts import render_send_email
     
@@ -180,7 +185,7 @@ in your app, you would need the following template files with the right extensio
 
 The subject template file can be omitted but you then need to supply the ``subject`` parameter. If you do not create a template with a .txt or a .html extension, then the associated format won't be included in the email. So, if you want to only send ASCII messages, do not create a .html file.
 
-Example without using a subject template::
+Example without using a subject template:
     render_send_email(['test1@mydomain.com', 'test@mydomain.com'], 'app/welcome', data, subject='Welcome new user', category='welcome')
 
 Templates

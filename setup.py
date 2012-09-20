@@ -22,11 +22,11 @@ setup(
         "Programming Language :: Python",
         "Framework :: Django",
     ],
-    # install_requires=[
-    #     "Django >= 1.4.1",
-    #     "redis == 2.4.10",
-    #     "celery",
-    #     "django-celery",
-    # ],
+    install_requires=[
+        "Django >= 1.4.1",
+        "redis == 2.4.10",
+        "celery",
+        "django-celery",
+    ],
     data_files=[('templates', ['base.html', 'base.txt'])],
 )

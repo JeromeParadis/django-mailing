@@ -123,6 +123,7 @@ Replacing the core django send_mail function
 --------------------------------------------
 
 To replace Django's core send_mail function to add support for email templates, SendGrid integration and background celery sending, add the following code to your settings file:
+
     import sys
     from mailing.mail import send_email_default
     try:
@@ -140,6 +141,7 @@ Simple multi-part send_mail replacement
 ---------------------------------------
 
 You can using mailing.send_email instead of Django's send_mail to send multi-part messages:
+
     send_email(recipients, subject, text_content=None, html_content=None, from_email=settings.DEFAULT_FROM_EMAIL, category=None, fail_silently=False, bypass_queue=False)
 
 Parameters are:
@@ -155,13 +157,14 @@ You must supply at least text_content or html_content. If both aren't supplied, 
 Example usage:
 
     from mailing import send_email
-
+    
     send_email(['test1@mydomain.com', 'test@mydomain.com'], 'Testing 1,2,3...', 'Text Body', 'HTML Body', category='testing')
 
 Rendering and sending emails using templates
 --------------------------------------------
 
 To use Django templates to generate dynamic emails, similar to using ``render_with_context`` in a Django view, use the ``render_send_email`` shortcut:
+
     render_send_email(recipients, template, data, from_email=settings.DEFAULT_FROM_EMAIL, subject=None, category=None, fail_silently=False, language='en', bypass_queue=False)
 
 Parameters are:
@@ -173,6 +176,7 @@ Parameters are:
  * ``category`` is a string and is used to define SendGrid's X-SMTPAPI's category header
 
 Example:
+
     def send_welcome_email(user):
         from mailing.shortcuts import render_send_email
     
@@ -192,8 +196,8 @@ Templates
 ---------
 
 The following templates are defined and used by django-mailing and should be overriten in your own templates:
- * templates/mailing/base.txt
- * templates/mailing/base.html
+ * ``templates/mailing/base.txt``
+ * ``templates/mailing/base.html``
 
 These are used to define your email overall look like the header and footer. The only requirement is to include the ``{{ content }}`` template variable. It is there than the supplied content of your email will be inserted in your base template.
 

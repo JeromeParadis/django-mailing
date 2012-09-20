@@ -74,11 +74,7 @@ Boolean indicating celery is configured and you want to send/process email relat
 
     MAILING_USE_CELERY = True
 
-For example, you can configure your app to use celery by installing a redis server and installing the following packages::
-    pip install celery
-    pip install redis
-    pip install django_celery
-
+For example, you can configure your app to use celery by installing a redis server.
 
 Your settings would also need to include things like::
 

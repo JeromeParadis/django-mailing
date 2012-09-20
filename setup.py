@@ -8,6 +8,7 @@ setup(
     author="Jerome Paradis",
     author_email="jparadis@paradivision.com",
     url="http://github.com/JeromeParadis/django-mailing",
+    license='LICENSE.txt',
     packages=[
         "mailing",
     ],
@@ -20,5 +21,11 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Framework :: Django",
-    ]
+    ],
+    install_requires=[
+        "Django >= 1.4.1",
+        "redis == 2.4.10",
+        "celery",
+        "django-celery",
+    ],
 )

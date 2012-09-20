@@ -31,6 +31,7 @@ settings.DEFAULT_FROM_EMAIL
 ---------------------------
 
 You need to set your default from email::
+
     DEFAULT_FROM_EMAIL = 'contact@mydomain.com'
 
 
@@ -110,6 +111,7 @@ Your settings would also need to include things like::
     CELERY_REDIS_DB = 0
 
 When running the celery daemon, you need to include the ``mailing`` app in the tasks through the ``include`` parameter. Example::
+
     manage.py celeryd --verbosity=2 --beat --schedule=celery --events --loglevel=INFO -I mailing
 
 You therefore could run a separate celery daemon to run your mailing tasks independently of other tasks if the need arises.
@@ -190,6 +192,7 @@ in your app, you would need the following template files with the right extensio
 The subject template file can be omitted but you then need to supply the ``subject`` parameter. If you do not create a template with a .txt or a .html extension, then the associated format won't be included in the email. So, if you want to only send ASCII messages, do not create a .html file.
 
 Example without using a subject template::
+
     render_send_email(['test1@mydomain.com', 'test@mydomain.com'], 'app/welcome', data, subject='Welcome new user', category='welcome')
 
 Templates

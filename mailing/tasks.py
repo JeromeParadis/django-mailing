@@ -2,7 +2,7 @@ from django.conf import settings
 
 from celery.task import task
 
-from . import send_email
+from mail import send_email
 from shortcuts import render_send_email
 
 @task(name="mailing.queue_send_email")

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.template.loader import render_to_string
 
-from . import send_email
+from mail import send_email
 
 def render_send_email(recipients, template, data, from_email=settings.DEFAULT_FROM_EMAIL, subject=None, category=None, fail_silently=False, language='en', bypass_queue=False):
     if not bypass_queue and hasattr(settings, 'MAILING_USE_CELERY') and settings.MAILING_USE_CELERY:

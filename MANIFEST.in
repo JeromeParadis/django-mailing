@@ -1,0 +1,5 @@
+include *.txt
+recursive-include docs *.txt
+recursive-include mailing *
+recursive-include mailing/templates *
+global-exclude *.pyc

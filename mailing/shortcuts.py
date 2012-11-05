@@ -33,6 +33,5 @@ def render_send_email(recipients, template, data, from_email=settings.DEFAULT_FR
             html_content = None
 
         translation.activate(prev_language)
-
         send_email(recipients, my_subject, text_content, html_content, from_email, use_base_template, category, fail_silently=fail_silently, language=None, bypass_queue=True)
         

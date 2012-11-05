@@ -24,7 +24,6 @@ def send_email(recipients, subject, text_content=None, html_content=None, from_e
     Will send a multi-format email to recipients. Email may be queued through celery
     """
     from django.conf import settings
-
     if not bypass_queue and hasattr(settings, 'MAILING_USE_CELERY') and settings.MAILING_USE_CELERY:
         from celery.execute import send_task
         return send_task('mailing.queue_send_email',[recipients, subject, text_content, html_content, from_email, use_base_template, category, fail_silently, language if language else translation.get_language()])

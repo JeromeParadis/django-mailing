@@ -19,14 +19,14 @@ class MailerMissingSubjectError(Exception):
 def send_email_default(*args, **kwargs):
     send_email(args[3],args[0],args[1], from_email=args[2], category='django core email')
 
-def send_email(recipients, subject, text_content=None, html_content=None, from_email=None, use_base_template=True, category=None, fail_silently=False, language=None, bypass_queue=False):
+def send_email(recipients, subject, text_content=None, html_content=None, from_email=None, use_base_template=True, category=None, fail_silently=False, language=None, cc=None, bcc=None, attachments=None, headers=None, bypass_queue=False):
     """
     Will send a multi-format email to recipients. Email may be queued through celery
     """
     from django.conf import settings
     if not bypass_queue and hasattr(settings, 'MAILING_USE_CELERY') and settings.MAILING_USE_CELERY:
         from celery.execute import send_task
-        return send_task('mailing.queue_send_email',[recipients, subject, text_content, html_content, from_email, use_base_template, category, fail_silently, language if language else translation.get_language()])
+        return send_task('mailing.queue_send_email',[recipients, subject, text_content, html_content, from_email, use_base_template, category, fail_silently, language if language else translation.get_language(), cc, bcc, attachments, headers])
     else:
 
         # Check for sendgrid support and add category header
@@ -35,11 +35,11 @@ def send_email(recipients, subject, text_content=None, html_content=None, from_e
             send_grid_support = settings.MAILING_USE_SENDGRID
         else:
             send_grid_support = False
-        
+
+        if not headers:
+            headers = dict()        
         if send_grid_support and category:
-            headers = {'X-SMTPAPI': '{"category": "%s"}' % category}
-        else:
-            headers = dict()
+            headers['X-SMTPAPI'] = '{"category": "%s%s"}' % (settings.MAILING_SENDGRID_CATEGORY_PREFIX if hasattr(settings, 'MAILING_SENDGRID_CATEGORY_PREFIX') else '', category)
 
         # Ensure recipients are in a list
         # --------------------------------
@@ -70,7 +70,7 @@ def send_email(recipients, subject, text_content=None, html_content=None, from_e
                     html_content = render_to_string('mailing/base.html', {'mailing_html_body': html_content, 'mailing_subject': subject}) if html_content else None
                 finally:
                     translation.activate(prev_language)
-            msg = EmailMultiAlternatives(subject, text_content if text_content else html_content, from_email if from_email else settings.DEFAULT_FROM_EMAIL, recipients_list, headers = headers)
+            msg = EmailMultiAlternatives(subject, text_content if text_content else html_content, from_email if from_email else settings.DEFAULT_FROM_EMAIL, recipients_list, cc=cc, bcc=bcc, attachments=attachments, headers = headers)
             if html_content and text_content:
                 msg.attach_alternative(html_content, "text/html")
             elif html_content: # Only HTML

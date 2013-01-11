@@ -24,7 +24,7 @@ setup(
     ],
     install_requires=[
         "Django >= 1.4.1",
-        "redis == 2.4.10",
+        "redis >= 2.4.10",
         "celery",
         "django-celery",
     ],

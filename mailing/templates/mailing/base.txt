@@ -1,1 +1,7 @@
-{{ content }}
+{% block email_header %}
+{% endblock %}
+{% block email_body %}
+	{{ mailing_text_body }}
+{% endblock %}
+{% block email_footer %}
+{% endblock %}

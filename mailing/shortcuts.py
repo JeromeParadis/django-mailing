@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.template import TemplateDoesNotExist
 from django.utils import translation
 
 from mail import send_email
@@ -20,16 +21,20 @@ def render_send_email(recipients, template, data, from_email=settings.DEFAULT_FR
                 my_subject = render_to_string('%s.subject' % template, data)
             except:
                 my_subject = None
+        if not data:
+            data = dict()
         if use_base_template and my_subject and 'mailing_subject' not in data:
             data['mailing_subject'] = my_subject
+        if 'settings' not in data:
+            data['settings'] = settings
         try:
             text_content = render_to_string('%s.txt' % template, data)
-        except:
+        except TemplateDoesNotExist:
             text_content = None
 
         try:
             html_content = render_to_string('%s.html' % template, data)
-        except:
+        except TemplateDoesNotExist:
             html_content = None
 
         translation.activate(prev_language)

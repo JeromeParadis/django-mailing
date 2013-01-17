@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 from django.utils import translation
@@ -61,15 +62,11 @@ def send_email(recipients, subject, text_content=None, html_content=None, from_e
         # --------------------------------
         if text_content or html_content:
             if use_base_template:
-                try:
-                    # Set language
-                    # --------------------------------
-                    prev_language = translation.get_language()
-                    language and translation.activate(language)
-                    text_content = render_to_string('mailing/base.txt', {'mailing_text_body': text_content, 'mailing_subject': subject}) if text_content else None
-                    html_content = render_to_string('mailing/base.html', {'mailing_html_body': html_content, 'mailing_subject': subject}) if html_content else None
-                finally:
-                    translation.activate(prev_language)
+                prev_language = translation.get_language()
+                language and translation.activate(language)
+                text_content = render_to_string('mailing/base.txt', {'mailing_text_body': text_content, 'mailing_subject': subject, 'settings': settings}) if text_content else None
+                html_content = render_to_string('mailing/base.html', {'mailing_html_body': html_content, 'mailing_subject': subject, 'settings': settings}) if html_content else None
+                translation.activate(prev_language)
             msg = EmailMultiAlternatives(subject, text_content if text_content else html_content, from_email if from_email else settings.DEFAULT_FROM_EMAIL, recipients_list, cc=cc, bcc=bcc, attachments=attachments, headers = headers)
             if html_content and text_content:
                 msg.attach_alternative(html_content, "text/html")
@@ -77,4 +74,4 @@ def send_email(recipients, subject, text_content=None, html_content=None, from_e
                 msg.content_subtype = "html"
             msg.send(fail_silently=fail_silently)
         else:
-            raise MailerInvalidBodyError('No text or html body supplied')
+            raise MailerInvalidBodyError('No text or html body supplied.')

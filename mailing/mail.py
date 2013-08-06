@@ -20,14 +20,14 @@ class MailerMissingSubjectError(Exception):
 def send_email_default(*args, **kwargs):
     send_email(args[3],args[0],args[1], from_email=args[2], category='django core email')
 
-def send_email(recipients, subject, text_content=None, html_content=None, from_email=None, use_base_template=True, category=None, fail_silently=False, language=None, cc=None, bcc=None, attachments=None, headers=None, bypass_queue=False):
+def send_email(recipients, subject, text_content=None, html_content=None, from_email=None, use_base_template=True, category=None, fail_silently=False, language=None, cc=None, bcc=None, attachments=None, headers=None, bypass_queue=False, bypass_hijacking=False):
     """
     Will send a multi-format email to recipients. Email may be queued through celery
     """
     from django.conf import settings
     if not bypass_queue and hasattr(settings, 'MAILING_USE_CELERY') and settings.MAILING_USE_CELERY:
         from celery.execute import send_task
-        return send_task('mailing.queue_send_email',[recipients, subject, text_content, html_content, from_email, use_base_template, category, fail_silently, language if language else translation.get_language(), cc, bcc, attachments, headers])
+        return send_task('mailing.queue_send_email',[recipients, subject, text_content, html_content, from_email, use_base_template, category, fail_silently, language if language else translation.get_language(), cc, bcc, attachments, headers, bypass_hijacking])
     else:
 
         # Check for sendgrid support and add category header
@@ -51,7 +51,7 @@ def send_email(recipients, subject, text_content=None, html_content=None, from_e
 
         # Check if we need to hijack the email
         # --------------------------------
-        if hasattr(settings, 'MAILING_MAILTO_HIJACK'):
+        if hasattr(settings, 'MAILING_MAILTO_HIJACK') and not bypass_hijacking:
             headers['X-MAILER-ORIGINAL-MAILTO'] = ','.join(recipients_list)
             recipients_list = [settings.MAILING_MAILTO_HIJACK]
 

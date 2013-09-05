@@ -20,14 +20,14 @@ class MailerMissingSubjectError(Exception):
 def send_email_default(*args, **kwargs):
     send_email(args[3],args[0],args[1], from_email=args[2], category='django core email')
 
-def send_email(recipients, subject, text_content=None, html_content=None, from_email=None, use_base_template=True, category=None, fail_silently=False, language=None, cc=None, bcc=None, attachments=None, headers=None, bypass_queue=False, bypass_hijacking=False):
+def send_email(recipients, subject, text_content=None, html_content=None, from_email=None, use_base_template=True, category=None, fail_silently=False, language=None, cc=None, bcc=None, attachments=None, headers=None, bypass_queue=False, bypass_hijacking=False, attach_files=None):
     """
     Will send a multi-format email to recipients. Email may be queued through celery
     """
     from django.conf import settings
     if not bypass_queue and hasattr(settings, 'MAILING_USE_CELERY') and settings.MAILING_USE_CELERY:
         from celery.execute import send_task
-        return send_task('mailing.queue_send_email',[recipients, subject, text_content, html_content, from_email, use_base_template, category, fail_silently, language if language else translation.get_language(), cc, bcc, attachments, headers, bypass_hijacking])
+        return send_task('mailing.queue_send_email',[recipients, subject, text_content, html_content, from_email, use_base_template, category, fail_silently, language if language else translation.get_language(), cc, bcc, attachments, headers, bypass_hijacking, attach_files])
     else:
 
         # Check for sendgrid support and add category header
@@ -72,6 +72,18 @@ def send_email(recipients, subject, text_content=None, html_content=None, from_e
                 msg.attach_alternative(html_content, "text/html")
             elif html_content: # Only HTML
                 msg.content_subtype = "html"
+
+            # Attach files through attach_files helper
+            # --------------------------------
+            if attach_files:
+                for att in attach_files:  # attachments are tuples of (filepath, mimetype, filename)
+                    with open(att[0], 'rb') as f:
+                        content = f.read()
+                    msg.attach(att[2], content, att[1])
+
+            # Send email
+            # --------------------------------
+
             msg.send(fail_silently=fail_silently)
         else:
             raise MailerInvalidBodyError('No text or html body supplied.')

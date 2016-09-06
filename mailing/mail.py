@@ -30,6 +30,7 @@ def send_email(recipients, subject, text_content=None, html_content=None, from_e
         return send_task('mailing.queue_send_email',[recipients, subject, text_content, html_content, from_email, use_base_template, category, fail_silently, language if language else translation.get_language(), cc, bcc, attachments, headers, bypass_hijacking, attach_files])
     else:
 
+        header_category_value = '%s%s' % (settings.MAILING_HEADER_CATEGORY_PREFIX if hasattr(settings, 'MAILING_HEADER_CATEGORY_PREFIX') else '', category)
         # Check for sendgrid support and add category header
         # --------------------------------
         if hasattr(settings, 'MAILING_USE_SENDGRID'):
@@ -40,7 +41,20 @@ def send_email(recipients, subject, text_content=None, html_content=None, from_e
         if not headers:
             headers = dict()        
         if send_grid_support and category:
-            headers['X-SMTPAPI'] = '{"category": "%s%s"}' % (settings.MAILING_SENDGRID_CATEGORY_PREFIX if hasattr(settings, 'MAILING_SENDGRID_CATEGORY_PREFIX') else '', category)
+            headers['X-SMTPAPI'] = '{"category": "%s"}' % header_category_value
+
+        # Check for Mailgun support and add label header
+        # --------------------------------
+        if hasattr(settings, 'MAILING_USE_MAILGUN'):
+            mailgun_support = settings.MAILING_USE_MAILGUN
+        else:
+            mailgun_support = False
+
+        if not headers:
+            headers = dict()        
+        if mailgun_support and category:
+            headers['X-Mailgun-Tag'] = header_category_value
+
 
         # Ensure recipients are in a list
         # --------------------------------

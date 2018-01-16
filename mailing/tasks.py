@@ -2,8 +2,8 @@ from django.conf import settings
 
 from celery.task import task
 
-from mail import send_email
-from shortcuts import render_send_email
+from mailing.mail import send_email
+from mailing.shortcuts import render_send_email
 
 @task(name="mailing.queue_send_email")
 def queue_send_email(recipients, subject, text_content=None, html_content=None, from_email=settings.DEFAULT_FROM_EMAIL, use_base_template=True, category=None, fail_silently=False, language=None, cc=None, bcc=None, attachments=None, headers=None, bypass_hijacking=False, attach_files=None): 

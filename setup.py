@@ -27,6 +27,7 @@ setup(
         "redis >= 2.4.10",
         "celery",
         "django-celery",
+	"six",
     ],
     package_data={'mailing': ['templates/mailing/base.html', 'templates/mailing/base.txt']},
 )

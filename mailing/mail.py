@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
-from django.utils import six
+import six
 from django.utils import translation
 
 # Define exception classes

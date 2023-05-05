@@ -1,7 +1,9 @@
+from __future__ import absolute_import
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 from django.utils import translation
+import six
 
 # Define exception classes
 # --------------------------------
@@ -58,7 +60,7 @@ def send_email(recipients, subject, text_content=None, html_content=None, from_e
 
         # Ensure recipients are in a list
         # --------------------------------
-        if isinstance(recipients, basestring):
+        if isinstance(recipients, six.string_types):
             recipients_list = [recipients]
         else:
             recipients_list = recipients

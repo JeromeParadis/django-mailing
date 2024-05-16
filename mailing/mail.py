@@ -4,6 +4,7 @@ from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 from django.utils import translation
 import six
+import json 
 
 # Define exception classes
 # --------------------------------
@@ -43,7 +44,13 @@ def send_email(recipients, subject, text_content=None, html_content=None, from_e
         if not headers:
             headers = dict()        
         if send_grid_support and category:
-            headers['X-SMTPAPI'] = '{"category": "%s"}' % header_category_value
+            if 'X-SMTPAPI' not in headers:
+                headers['X-SMTPAPI'] = '{"category": "%s"}' % header_category_value
+            else:
+                xsmtpapi = headers['X-SMTPAPI']
+                if type(xsmtpapi) == dict:
+                    xsmtpapi['category'] = header_category_value
+                    headers['X-SMTPAPI'] = json.dumps(xsmtpapi)
 
         # Check for Mailgun support and add label header
         # --------------------------------

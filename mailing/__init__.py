@@ -1,7 +1,7 @@
 # Versioning
 # --------------------------------
 #VERSION = (0, 1, 0, "beta", 11) # following PEP 386
-VERSION = (0, 2, 3, "f") # following PEP 386
+VERSION = (0, 2, 4, "f") # following PEP 386
 DEV_N = None
 
 def get_version():

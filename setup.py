@@ -8,7 +8,7 @@ setup(
     author="Jerome Paradis",
     author_email="jparadis@paradivision.com",
     url="http://github.com/JeromeParadis/django-mailing",
-    license='LICENSE.txt',
+    license = "GPL-3.0-or-later",
     packages=[
         "mailing",
     ],
